@@ -215,19 +215,19 @@ def get_hw_type(racktables_object_id):
 
 def getRowsAtSite(cursor, siteId):
 	rows = []
-	cursor.execute("SELECT child_entity_id FROM EntityLink WHERE parent_entity_type='location' AND parent_entity_id=%s AND child_entity_type='row'",siteId)
+	cursor.execute("SELECT child_entity_id FROM EntityLink WHERE parent_entity_type='location' AND parent_entity_id="+ str(siteId) +" AND child_entity_type='row'")
 	rowIds = cursor.fetchall()
 	for rowId in rowIds:
-		cursor.execute("SELECT id,name,label,asset_no,comment FROM Object WHERE id=%s",rowId[0])
+		cursor.execute("SELECT id,name,label,asset_no,comment FROM Object WHERE id="+ str(rowId[0]))
 		rows += cursor.fetchall()
 	return rows
 
 def getRacksAtRow(cursor, rowId):
 	racks = []
-	cursor.execute("SELECT child_entity_id FROM EntityLink WHERE parent_entity_type='row' AND parent_entity_id=%s AND child_entity_type='rack'",rowId)
+	cursor.execute("SELECT child_entity_id FROM EntityLink WHERE parent_entity_type='row' AND parent_entity_id="+ str(rowId) +" AND child_entity_type='rack'")
 	rackIds = cursor.fetchall()
 	for rackId in rackIds:
-		cursor.execute("SELECT id,name,label,asset_no,comment FROM Object WHERE id=%s", rackId[0])
+		cursor.execute("SELECT id,name,label,asset_no,comment FROM Object WHERE id="+ str(rackId[0]))
 		racks += cursor.fetchall()
 	return racks
 
