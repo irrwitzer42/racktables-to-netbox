@@ -125,6 +125,33 @@ interface_name_mappings = {
 	"Hu": "HundredGigE",
 }
 
+# Define custom fields to ignore
+ignorelist_custom_fields = set()
+ignorelist_custom_fields.add(2)
+ignorelist_custom_fields.add(4)
+ignorelist_custom_fields.add(21)
+ignorelist_custom_fields.add(22)
+ignorelist_custom_fields.add(24)
+ignorelist_custom_fields.add(26)
+ignorelist_custom_fields.add(30)
+ignorelist_custom_fields.add(10000)
+ignorelist_custom_fields.add(10001)
+ignorelist_custom_fields.add(10003)
+ignorelist_custom_fields.add(10004)
+ignorelist_custom_fields.add(10005)
+ignorelist_custom_fields.add(10006)
+ignorelist_custom_fields.add(10007)
+ignorelist_custom_fields.add(10008)
+ignorelist_custom_fields.add(10010)
+ignorelist_custom_fields.add(10011)
+ignorelist_custom_fields.add(10012)
+ignorelist_custom_fields.add(10013)
+ignorelist_custom_fields.add(10014)
+ignorelist_custom_fields.add(10015)
+ignorelist_custom_fields.add(10016)
+ignorelist_custom_fields.add(10017)
+
+
 parent_objtype_ids = [pair[0] for pair in parent_child_objtype_id_pairs]
 
 global_names = set()
