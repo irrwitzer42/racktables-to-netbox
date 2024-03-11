@@ -1,5 +1,5 @@
 from netbox import NetBox
-import pymysql
+from mysql.connector import connect, Error
 from slugify import slugify
 import pickle
 import os
@@ -7,9 +7,15 @@ import time
 import ipaddress
 import random
 import threading
+from dotenv import load_dotenv
+from pprint import pprint
 
-# Messy script to transfer Racktables SQL to NetBox
+# Messy script to transfer Racktables SQL to NetBox (originally by Bandwidth-Intern https://github.com/bandwidth-intern/racktables-to-netbox)
+#
+# Preparations:
+#
 # Set "MAX_PAGE_SIZE=0" in "env/netbox.env"
+# Install Netbox Plugin netbox-initializers (https://github.com/tobiasge/netbox-initializers)
 # Add the printed custom_fields to initialization/custom_fields.yaml for all the fields from Racktables
 
 # Set all the bools to True and run once through for correct result, they were for debugging problems. Some info is cached with pickle, though
@@ -34,23 +40,27 @@ CREATE_IP_ALLOCATED =          True
 CREATE_IP_NOT_ALLOCATED =      True
 
 
-# The length to exceed for a site to be considered a location (like an address) not a site
-SITE_NAME_LENGTH_THRESHOLD = 10
-
 # Each step may cache some data relevant to the next step. This will stop that from happening in the pickle load function
 STORE_DATA = False
 
-rt_host = '127.0.0.1'
-rt_port = 3306
-rt_user = 'root'
-rt_db = 'test1'
-connection = pymysql.connect(host=rt_host,user=rt_user,db=rt_db, port=rt_port)
+# Read config file
+load_dotenv()
 
-nb_host = '10.248.48.4'
-nb_port = 8001
-nb_token = '0123456789abcdef0123456789abcdef01234567'
+# The length to exceed for a site to be considered a location (like an address) not a site
+SITE_NAME_LENGTH_THRESHOLD = int(os.environ['SITE_NAME_LENGTH_THRESHOLD']) | 10
 
-netbox = NetBox(host=nb_host, port=nb_port, use_ssl=False, auth_token=nb_token)
+try:
+	connection = connect(
+			host=os.environ['RTMYSQL_HOST'],
+			user=os.environ['RTMYSQL_USER'],
+			password=os.environ['RTMYSQL_PW'],
+			database=os.environ['RTMYSQL_DB']
+		)
+
+except Exception as e:
+	print(f"Connection to Racktables mysql DB failed: {e}")
+
+netbox = NetBox(host=os.environ['NETBOX_HOST'], port=os.environ['NETBOX_PORT'], use_ssl=False, auth_token=os.environ['NETBOX_TOKEN'])
 
 # This might not be all. Used for looking up non-racked items. Key names are for reference
 objtype_id_names = {
