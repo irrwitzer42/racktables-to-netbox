@@ -299,7 +299,12 @@ def createDeviceAtLocationInRack(device_name, face, start_height, device_role, m
 		if asset_no and asset_no in asset_tags:
 			asset_no = asset_no+ "-1"
 
-		device = netbox.dcim.create_device(custom_fields=custom_fields,face=face,cluster={"name":device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no,serial=serial,position=start_height,name=name_at_location,device_role=device_role,manufacturer={"name":manufacturer},device_type=device_type_model,site_name=site_name,rack={"name":rack_name})
+		#device = netbox.dcim.create_device(custom_fields=custom_fields,face=face,cluster={"name":device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no,serial=serial,position=start_height,name=name_at_location,device_role=device_role,manufacturer={"name":manufacturer},device_type=device_type_model,site_name=site_name,rack={"name":rack_name},status="active")
+		if device_in_vm_cluster:
+			device = netbox.dcim.create_device(custom_fields=custom_fields,face=face,cluster={"name":device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no,serial=serial,position=start_height,name=name_at_location,device_role=device_role,role={"name":device_role},manufacturer={"name":manufacturer},device_type=device_type_model,site_name=site_name,rack={"name":rack_name},status="active")
+		else:
+			device = netbox.dcim.create_device(custom_fields=custom_fields,face=face,asset_tag=asset_no,serial=serial,position=start_height,name=name_at_location,device_role=device_role,role={"name":device_role},manufacturer={"name":manufacturer},device_type=device_type_model,site_name=site_name,rack={"name":rack_name},status="active")
+
 		asset_tags.add(asset_no)
 
 		id_at_location = device['id']
@@ -555,7 +560,7 @@ def get_custom_fields(cursor, racktables_object_id, initial_dict=None):
 	for attr_id,string_value,uint_value in attributes:
 		
 		# Skip the HW Type because this is used for the type and height and "Serial Tag"
-		if attr_id == 2 or attr_id == 27 or attr_id == 10014:
+		if attr_id == 2 or attr_id == 27 or attr_id == 10014 or attr_id in ignorelist_custom_fields:
 			continue
 
 		custom_fields[slugified_attributes[attr_id]] = string_value if string_value else uint_value
@@ -710,8 +715,12 @@ def create_parent_child_devices(cursor, data, objtype_id):
 			if asset_no and asset_no in asset_tags:
 				asset_no = asset_no+ "-1"
 
-			# print("Creating device \"{}\"".format(object_name), device_type_model, device_role, manufacturer, site_name, asset_no)		
-			added_device = netbox.dcim.create_device(name=object_name,cluster={"name": device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no, serial=serial,custom_fields=custom_fields, device_type=device_type_model, device_role=device_role, site_name=site_name,comment=comment[:200] if comment else "",tags=device_tags)
+			# print("Creating device \"{}\"".format(object_name), device_type_model, device_role, manufacturer, site_name, asset_no)
+			# added_device = netbox.dcim.create_device(name=object_name,cluster={"name": device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no, serial=serial,custom_fields=custom_fields, device_type=device_type_model, device_role=device_role, site_name=site_name,comment=comment[:200] if comment else "",tags=device_tags)
+			if device_in_vm_cluster:
+				added_device = netbox.dcim.create_device(name=object_name,cluster={"name": device_vm_cluster_name} if device_in_vm_cluster else None,asset_tag=asset_no, serial=serial,custom_fields=custom_fields, device_type=device_type_model, device_role=device_role, role={"name":device_role}, site_name=site_name,comment=comment[:200] if comment else "",tags=device_tags)
+			else:
+				added_device = netbox.dcim.create_device(name=object_name,asset_tag=asset_no, serial=serial,custom_fields=custom_fields, device_type=device_type_model, device_role=device_role, role={"name":device_role}, site_name=site_name,comment=comment[:200] if comment else "",tags=device_tags)
 			asset_tags.add(asset_no)
 
 			# Later used for creating interfaces
