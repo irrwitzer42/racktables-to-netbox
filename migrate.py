@@ -18,33 +18,32 @@ from pprint import pprint
 # Install Netbox Plugin netbox-initializers (https://github.com/tobiasge/netbox-initializers)
 # Add the printed custom_fields to initialization/custom_fields.yaml for all the fields from Racktables
 
-# Set all the bools to True and run once through for correct result, they were for debugging problems. Some info is cached with pickle, though
-
-CREATE_VLAN_GROUPS =           True
-CREATE_VLANS =                 True
-# This also creates the clusters, which are needed for all devices
-CREATE_MOUNTED_VMS =           True
-CREATE_UNMOUNTED_VMS =         True
-CREATE_RACKED_DEVICES =        True
-# Non racked devices depend on racked devices being created first
-CREATE_NON_RACKED_DEVICES =    True
-# Interfaces rely on devices being created
-CREATE_INTERFACES =            True
-# Interface connections depend on all interfaces created
-CREATE_INTERFACE_CONNECTIONS = True
-CREATE_IPV4 =                  True
-CREATE_IPV6 =                  True
-# IP space depends on interfaces being created
-CREATE_IP_NETWORKS =           True
-CREATE_IP_ALLOCATED =          True
-CREATE_IP_NOT_ALLOCATED =      True
-
-
-# Each step may cache some data relevant to the next step. This will stop that from happening in the pickle load function
-STORE_DATA = False
-
 # Read config file
 load_dotenv()
+
+# Set all the bools to True and run once through for correct result, they were for debugging problems. Some info is cached with pickle, though
+
+CREATE_VLAN_GROUPS =			(os.getenv('CREATE_VLAN_GROUPS', 'False') == 'True')
+CREATE_VLANS =					(os.getenv('CREATE_VLANS', 'False') == 'True')
+# This also creates the clusters, which are needed for all devices
+CREATE_MOUNTED_VMS =			(os.getenv('CREATE_MOUNTED_VMS', 'False') == 'True')
+CREATE_UNMOUNTED_VMS =			(os.getenv('CREATE_UNMOUNTED_VMS', 'False') == 'True')
+CREATE_RACKED_DEVICES =			(os.getenv('CREATE_RACKED_DEVICES', 'False') == 'True')
+# Non racked devices depend on racked devices being created first
+CREATE_NON_RACKED_DEVICES =		(os.getenv('CREATE_NON_RACKED_DEVICES', 'False') == 'True')
+# Interfaces rely on devices being created
+CREATE_INTERFACES =				(os.getenv('CREATE_INTERFACES', 'False') == 'True')
+# Interface connections depend on all interfaces created
+CREATE_INTERFACE_CONNECTIONS = 	(os.getenv('CREATE_INTERFACE_CONNECTIONS', 'False') == 'True')
+CREATE_IPV4 =					(os.getenv('CREATE_IPV4', 'False') == 'True')
+CREATE_IPV6 =					(os.getenv('CREATE_IPV6', 'False') == 'True')
+# IP space depends on interfaces being created
+CREATE_IP_NETWORKS =			(os.getenv('CREATE_IP_NETWORKS', 'False') == 'True')
+CREATE_IP_ALLOCATED =			(os.getenv('CREATE_IP_ALLOCATED', 'False') == 'True')
+CREATE_IP_NOT_ALLOCATED =		(os.getenv('CREATE_IP_NOT_ALLOCATED', 'False') == 'True')
+
+# Each step may cache some data relevant to the next step. This will stop that from happening in the pickle load function
+STORE_DATA = bool(os.environ['STORE_DATA'])
 
 # The length to exceed for a site to be considered a location (like an address) not a site
 SITE_NAME_LENGTH_THRESHOLD = int(os.environ['SITE_NAME_LENGTH_THRESHOLD']) | 10
